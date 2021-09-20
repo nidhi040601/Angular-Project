@@ -1,31 +1,52 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
+import { IProduct } from "./product";
+import { ProductService } from "./product.service";
 
 @Component({
     selector: 'pm-products',
     templateUrl: './product-list.component.html',
+    styleUrls: ['./product-list.component.css']
 })
 
-export class ProductListComponent{
+export class ProductListComponent implements OnInit{
     pageTitle: string = "Product List";
-    products: any[] = [ {
-        "productId": 1,
-        "productName": "Leaf Rake",
-        "productCode": "GDN-0011",
-        "releaseDate": "March 19, 2016",
-        "description": "Leaf rake with 48-inch wooden handle.",
-        "price": 19.95,
-        "starRating": 3.2,
-        "imageUrl": "http://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png"
-    },
-    {
-        "productId": 2,
-        "productName": "Garden Cart",
-        "productCode": "GDN-0023",
-        "releaseDate": "March 18, 2016",
-        "description": "15 gallon capacity rolling garden cart",
-        "price": 32.99,
-        "starRating": 4.2,
-        "imageUrl": "http://openclipart.org/image/300px/svg_to_png/58471/garden_cart.png"
-    } 
-    ];
+    imageWidth: number = 50;
+    imageMargin: number = 2;
+    showImage: boolean = false;
+    
+    _listFilter: string;                        //We can use ngModel here but this is the better bcoz we want to perform something as value changes
+	get listFilter() : string{
+		return this._listFilter;
+	}
+	set listFilter(value: string){
+		this._listFilter = value;
+		this.filteredProducts = this.listFilter ? this.performFilter(this.listFilter) : this.products;
+	}
+
+    filteredProducts : IProduct[];
+
+    products: IProduct[] = []            //Its easy to find error in this if we use interface for products
+
+    constructor(private _prodcutService: ProductService){                                //It is the best place to set default values for more complex property 
+        this.listFilter = 'cart';
+    }
+
+    performFilter(filterBy : string) : IProduct[] {
+        filterBy = filterBy.toLocaleLowerCase();                    //Convert it to lowercase
+        return this.products.filter((product : IProduct) =>         //Here we find it using indexOf method in which if find means index is instead of '-1' then add it
+            product.productName.toLocaleLowerCase().indexOf(filterBy) !== -1);
+    }
+
+    onRatingClicked(message : string) : void{
+        this.pageTitle = 'Product List: ' + message;
+    }
+
+    toggleImage(): void{
+        this.showImage = !this.showImage;
+    }
+
+    ngOnInit(): void{
+        this.products = this._prodcutService.getProducts();            //We can call this service in constructor but later we fill fetch data from database and thus dont wanna include this code in constructor
+        this.filteredProducts = this.products;                         //We moved it here from constructor bcoz constructor will execute first n then we get nothing in products.            
+    }
 }
