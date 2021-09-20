@@ -3,7 +3,7 @@ import { IProduct } from "./product";
 import { ProductService } from "./product.service";
 
 @Component({
-    selector: 'pm-products',
+    // selector: 'pm-products',        Remove this as we dont need it more as we are using routing
     templateUrl: './product-list.component.html',
     styleUrls: ['./product-list.component.css']
 })
@@ -13,6 +13,7 @@ export class ProductListComponent implements OnInit{
     imageWidth: number = 50;
     imageMargin: number = 2;
     showImage: boolean = false;
+    errMessage: string;
     
     _listFilter: string;                        //We can use ngModel here but this is the better bcoz we want to perform something as value changes
 	get listFilter() : string{
@@ -46,7 +47,14 @@ export class ProductListComponent implements OnInit{
     }
 
     ngOnInit(): void{
-        this.products = this._prodcutService.getProducts();            //We can call this service in constructor but later we fill fetch data from database and thus dont wanna include this code in constructor
-        this.filteredProducts = this.products;                         //We moved it here from constructor bcoz constructor will execute first n then we get nothing in products.            
-    }
-}
+        // this.products = this._prodcutService.getProducts();            //We can call this service in constructor but later we fill fetch data from database and thus dont wanna include this code in constructor
+        
+        this._prodcutService.getProducts()
+            .subscribe(product => { 
+                            this.products = product,
+                            this.filteredProducts = this.products;                         //We moved it here from constructor bcoz constructor will execute first n then we get nothing in products.            
+                        },
+                       error => this.errMessage = <any>error);
+
+            }
+}   
