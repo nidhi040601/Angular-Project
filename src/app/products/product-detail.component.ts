@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 
 import { IProduct } from "./product";
 
@@ -13,7 +13,8 @@ export class ProductDetailComponent implements OnInit {
     pageTitle: string = 'Product Detail';
     product: IProduct;
 
-    constructor(private _route: ActivatedRoute) {}
+    constructor(private _route: ActivatedRoute,
+                private _router: Router) {}
 
     ngOnInit(){
         let id = +this._route.snapshot.paramMap.get('id');     //'+' is a JS shortcut to convert the parameter string into numeric id
@@ -29,4 +30,10 @@ export class ProductDetailComponent implements OnInit {
             "imageUrl": "http://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png"
         }
     }
+
+
+    onBack() : void{
+        this._router.navigate(['/products']);
+    }
+
 }
